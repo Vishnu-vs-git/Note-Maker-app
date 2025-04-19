@@ -1,8 +1,11 @@
 import React from 'react'
+import NoteMaker from './NoteMaker'
 
 const App = () => {
   return (
-    <div>App</div>
+    <div>
+      <NoteMaker/>
+    </div>
   )
 }
 
