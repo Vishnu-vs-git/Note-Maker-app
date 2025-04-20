@@ -1,10 +1,13 @@
 import express,{Request,Response} from "express";
-import Note from "../../models/Note";
+import Note from "../../models/Note.js";
 
 
 export const addNote=async (req:Request,res:Response):Promise<void>=>{
   try{
+     console.log("hello")
+     console.log(req.body)
     const{title, content,subject}=req.body;
+    console.log(title,content,subject)
     const newNote= new Note({
       title,
       content,

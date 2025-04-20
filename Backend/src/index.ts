@@ -1,7 +1,7 @@
 import express from "express"
 import dotenv from "dotenv"
 import  mongoose from "mongoose"
-import notesRoutes from "./routes/note/noteRoutes"
+import notesRoutes from "./routes/note/noteRoutes.js"
 
 dotenv.config()
 
@@ -23,6 +23,9 @@ mongoose.connect(process.env.MONGO as string)
 
 const app =express()
   const PORT=process.env.PORT||5000
+
+  app.use(express.json()); 
+
 
   app.use("/api/notes",notesRoutes)
 
