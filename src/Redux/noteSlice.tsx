@@ -17,13 +17,14 @@ const noteSlice=createSlice({
       reducer:(state,action:PayloadAction<NoteType>)=>{
         state.notes.push(action.payload);
       },
-      prepare:(title:string,content:string)=>{
+      prepare:(title:string,content:string,subject:string)=>{
         
         return {
           payload:{
             id:nanoid(),
             title,
             content,
+            subject,
             date:new Date().toLocaleString(),
           } as NoteType,
         }
