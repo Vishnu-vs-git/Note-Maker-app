@@ -2,6 +2,7 @@ export interface NoteType{
    id:string;
    title:string,
    content:string,
+   subject:string,
    date:string
 }
 
