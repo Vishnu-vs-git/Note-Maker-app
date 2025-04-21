@@ -41,7 +41,7 @@ if(newSubject) dispatch(addSubjects(newSubject))
   return (
     <div  className="min-h-screen bg-amber-600 p-5">
       <div className="max-w-md mx-auto bg-white p-6 rounded-b-lg shadow-lg "></div>
-      <h1 className='text-2xl font-semibold text-center mb-4'>Note maker</h1>
+      <h1 className='text-2xl font-semibold text-center mb-4'>Add Note</h1>
 
       < form onSubmit={handleSubmit}>
          <input
