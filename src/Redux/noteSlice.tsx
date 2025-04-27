@@ -5,7 +5,9 @@ import { NoteType,NoteState } from "../types/types";
 
 
 const initialState:NoteState={
-  notes:[]
+  notes:[],
+  
+
 }
 
 
