@@ -4,7 +4,7 @@ const router=express.Router()
 
 
 router.get("/",getNotes);
-router.post("/", addNote)
+router.post("/add", addNote)
 router.put("/edit/:id",editNote)
 router.delete("/delete/:id", deleteNote)
 

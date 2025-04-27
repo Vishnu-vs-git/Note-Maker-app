@@ -16,7 +16,7 @@ const EditNote = () => {
  });
  const fetchNote =async () =>{
   try{
-    const response = await axios.get(`http://localhost :5000/api/notes/${id}`);
+    const response = await axios.get(`/api/notes/${id}`);
     setNote(response.data.note);
   }catch(error){
     console.error("Error in fetching note",error);
@@ -34,7 +34,7 @@ const EditNote = () => {
  const handleSubmit = async (e:React.FormEvent)=>{
   e.preventDefault();
   try{
-     await axios.put(`http://localhost:5000/api/notes/${id}`,{
+     await axios.put(`/api/notes/${id}`,{
       subject:note.subject,
       title:note.title,
       content:note.content

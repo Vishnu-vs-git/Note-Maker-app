@@ -1,98 +1,84 @@
-import React, { useRef, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { addNote } from '../Redux/noteSlice'
-import { addSubjects } from '../Redux/subjectSlice'
-import { useNavigate } from 'react-router-dom'
-import { RootState } from '../Redux/Store'
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AddNote = () => {
- const dispatch=useDispatch()
- const titleRef= useRef(null);
- const contentRef= useRef(null);
- const navigate=useNavigate()
- const [title,setTitle]=useState<string>("")
- const [content,setContent]=useState<string>("")
- const subjects= useSelector((state:RootState)=>{
-   return state.subjects.subjects
- })
- const[subject,setsubject]=useState(subjects[0]||"")
- const[newSubject,setNewSubject]=useState("")
+  const navigate = useNavigate();
 
- const Notes= useSelector((state:RootState)=>{
-     return state.notes.notes
- })
- const handleSubmit=(e:React.FormEvent)=>{
-  e.preventDefault();
+  const [note, setNote] = useState({
+    subject: '',
+    title: '',
+    content: ''
+  });
 
-   const selectedSubject=newSubject||subject
-if(!selectedSubject||!title||!content) return
-  
-if(newSubject) dispatch(addSubjects(newSubject))
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setNote({ ...note, [e.target.name]: e.target.value });
+  };
 
- 
-     dispatch(addNote(title,content,selectedSubject))
-     setTitle("")
-     setContent("")
-     navigate("/notes")
-  
- }
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/notes/add', {
+        subject: note.subject,
+        title: note.title,
+        content: note.content
+      });
+      navigate('/view-notes'); // after adding, go to View Notes
+    } catch (error) {
+      console.error('Error adding note:', error);
+    }
+  };
 
   return (
-    <div  className="min-h-screen bg-amber-600 p-5">
-      <div className="max-w-md mx-auto bg-white p-6 rounded-b-lg shadow-lg "></div>
-      <h1 className='text-2xl font-semibold text-center mb-4'>Add Note</h1>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-bold mb-6">Add New Note</h1>
 
-      < form onSubmit={handleSubmit}>
-         <input
-            ref={titleRef}
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md max-w-md mx-auto">
+        <div className="mb-4">
+          <label className="block font-semibold mb-1">Subject</label>
+          <input
             type="text"
-            placeholder="Note Title"
-            value={title}
-            onChange={(e)=>setTitle(e.target.value)}
-            className='w-full p-2 mb-2 border rounded-md'
-            />
+            name="subject"
+            value={note.subject}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            required
+          />
+        </div>
 
-            <textarea 
-              ref={contentRef}
-              placeholder='Note content'
-              value={content}
-              onChange={(e)=>setContent(e.target.value)}
-              className='w-full p-2 mb-2 border rounded-md'
-              />
+        <div className="mb-4">
+          <label className="block font-semibold mb-1">Title</label>
+          <input
+            type="text"
+            name="title"
+            value={note.title}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            required
+          />
+        </div>
 
-              <select
-                 value={subject}
-                 onChange={(e)=>setsubject(e.target.value)}
-                 className="w-full p-2 mb-2 border rounded"
-                 >
-                  {subjects.map((sub,index)=>(
-                    <option key={index} value={sub}>
-                      {sub}
-                    </option>
-                  ))}
-                 </select>
+        <div className="mb-4">
+          <label className="block font-semibold mb-1">Content</label>
+          <textarea
+            name="content"
+            value={note.content}
+            onChange={handleChange}
+            rows={5}
+            className="w-full border border-gray-300 rounded px-3 py-2"
+            required
+          ></textarea>
+        </div>
 
-                 <input 
-                   type="text"
-                   placeholder='Add new subjects'
-                   value={newSubject}
-                   onChange={(e)=>setNewSubject(e.target.value)}
-                   className='w-full p-2 mb-2 border rounded'
-                   />
-
-                   <button 
-                     type="submit"
-                     className="bg-blue-600 text-white w-full py-2 rounded mt-2"
-                     >
-                       Save Note
-                     </button>
-            
-      
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Add Note
+        </button>
       </form>
-
     </div>
-  )
-}
+  );
+};
 
-export default AddNote
+export default AddNote;
