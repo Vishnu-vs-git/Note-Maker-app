@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/controllers/notes/addnotes.ts","./src/models/note.ts","./src/routes/note/noteroutes.ts"],"version":"5.8.2"}

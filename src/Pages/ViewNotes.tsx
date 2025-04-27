@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { NoteType } from '../types/types';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ViewNotes = () => {
-  
-
   const [notes, setNotes] = useState<NoteType[]>([]);
+  const [expandedNoteId, setExpandedNoteId] = useState<string | null>(null); // ⭐
+
   const navigate = useNavigate();
 
   const fetchNotes = async () => {
     try {
       const response = await axios.get('/api/notes');
-      console.log(response)
       setNotes(response.data);
     } catch (error) {
       console.error('Error fetching notes:', error);
@@ -22,85 +22,98 @@ const ViewNotes = () => {
   useEffect(() => {
     fetchNotes();
   }, []);
-console.log(notes)
 
-
-
-
-
-
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (_id: string) => {
     try {
-      await axios.delete(`/api/notes/${id}`);
-      setNotes(notes.filter(note => note.id !== id));
+      await axios.delete(`/api/notes/delete/${_id}`);
+      toast.success("Note deleted successfully!");
+      setNotes(notes.filter(note => note._id !== _id));
     } catch (error) {
       console.error("Error deleting note:", error);
     }
   };
 
-  const handleEdit = (id: string) => {
-    navigate(`/edit-note/${id}`);
+  const handleEdit = (_id: string) => {
+    navigate(`/edit-note/${_id}`);
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedNoteId(prevId => (prevId === id ? null : id));
   };
 
   const subjectColors = {
-    Work: "bg-orange-400",
-    Personal: "bg-pink-400",
-    Health: "bg-green-400",
-    Study: "bg-purple-400",
-    Reminder: "bg-red-400",
+    Work: "bg-yellow-400",
+    Personal: "bg-pink-300",
+    Health: "bg-green-300",
+    Study: "bg-purple-300",
+    Reminder: "bg-red-300",
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-6 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 via-white to-gray-100 py-10 px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 tracking-tight">My Notes</h1>
+        <div className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-700">📚 Your Notes</h1>
 
-          <Link 
+          <Link
             to="/add-note"
-            className="inline-block bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-105 text-lg font-semibold"
+            className="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-3 px-5 rounded-lg shadow-md transition-transform hover:scale-105"
           >
-            + Add Note
+            ➕ Add Note
           </Link>
         </div>
 
         {/* Notes Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {notes.map(note => {
-            const badgeColor = subjectColors[note.subject as keyof typeof subjectColors] || "bg-orange-400";
+            const badgeColor = subjectColors[note.subject as keyof typeof subjectColors] || "bg-blue-300";
+            const isExpanded = expandedNoteId === note._id;
 
             return (
               <div
-                key={note.id}
-                className="bg-white rounded-3xl shadow-lg hover:shadow-2xl p-6 flex flex-col transition-transform duration-300 hover:-translate-y-2 hover:scale-105 border border-gray-200"
+                key={note._id}
+                className="group relative bg-white p-6 rounded-2xl shadow-sm hover:shadow-lg transition-all border border-gray-200"
               >
-                {/* Badge */}
-                <div className="flex items-center mb-4">
-                  <span className={`text-xs font-bold text-white px-3 py-1 rounded-full ${badgeColor}`}>
+                {/* Subject badge */}
+                <div className="absolute top-4 right-4">
+                  <span className={`text-xs font-semibold text-white px-3 py-1 rounded-full ${badgeColor}`}>
                     {note.subject}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">{note.title}</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  {note.title}
+                </h2>
 
                 {/* Content */}
-                <p className="text-gray-600 text-sm mb-6 line-clamp-3">{note.content}</p>
+                <p className={`text-gray-500 text-sm mb-4 ${isExpanded ? '' : 'line-clamp-4'}`}>
+                  {note.content}
+                </p>
+
+                {/* Read More / Show Less Button */}
+                {note.content.length > 150 && (
+                  <button
+                    onClick={() => toggleExpand(note._id)}
+                    className="text-indigo-500 hover:underline text-xs font-semibold mb-6"
+                  >
+                    {isExpanded ? 'Show Less ▲' : 'Read More ▼'}
+                  </button>
+                )}
 
                 {/* Actions */}
-                <div className="mt-auto flex justify-between items-center pt-4 border-t border-gray-100">
+                <div className="absolute bottom-4 left-6 right-6 flex justify-between items-center">
                   <button
-                    onClick={() => handleEdit(note.id)}
-                    className="text-indigo-500 hover:text-indigo-600 font-semibold text-sm transition"
+                    onClick={() => handleEdit(note._id)}
+                    className="text-indigo-500 hover:text-indigo-600 text-sm font-semibold transition"
                   >
                     ✏️ Edit
                   </button>
-
                   <button
-                    onClick={() => handleDelete(note.id)}
-                    className="text-rose-500 hover:text-rose-600 font-semibold text-sm transition"
+                    onClick={() => handleDelete(note._id)}
+                    className="text-rose-500 hover:text-rose-600 text-sm font-semibold transition"
                   >
                     🗑️ Delete
                   </button>

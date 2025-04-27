@@ -23,7 +23,7 @@ const noteSlice=createSlice({
         
         return {
           payload:{
-            id:nanoid(),
+            _id:nanoid(),
             title,
             content,
             subject,
